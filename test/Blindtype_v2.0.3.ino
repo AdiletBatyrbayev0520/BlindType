@@ -96,7 +96,7 @@ GameState currentState = IDLE;
 // ============================================================
 //  ПЕРЕМЕННЫЕ ИГРЫ
 // ============================================================
-int  currentVolume   = 15;
+int  currentVolume   = 30;
 int  selectedGame    = 0;
 int  currentLetterId = -1;
 char lastTypedChar   = '\0';
@@ -299,7 +299,7 @@ void handleKeyPress(int row, int col, char keyChar) {
     case IDLE:
       if (row == KEY_START_ROW && col == KEY_START_COL) {
         currentState = MENU;
-        myDFPlayer.playMp3Folder(TRACK_MENU_BEEP);
+        myDFPlayer.play(TRACK_MENU_BEEP);
         drawScreen("МЕНЮ", "1=Игра1  2=Игра2", "3=Игра3");
       }
       break;
@@ -317,7 +317,7 @@ void handleKeyPress(int row, int col, char keyChar) {
         char buf[20];
         snprintf(buf, sizeof(buf), "Буква: %s", alphabet[currentLetterId].symbol);
         drawScreen("СЛУШАЙ", buf, "Введи букву");
-        myDFPlayer.playMp3Folder(alphabet[currentLetterId].id);
+        myDFPlayer.play(alphabet[currentLetterId].id);
       }
       break;
 
@@ -325,22 +325,22 @@ void handleKeyPress(int row, int col, char keyChar) {
     case MENU:
       if (row == KEY_GAME1_ROW && col == KEY_GAME1_COL) {
         selectedGame = 1;
-        myDFPlayer.playMp3Folder(TRACK_MENU_BEEP);
+        myDFPlayer.play(TRACK_MENU_BEEP);
         drawScreen("ИГРА 1", "Слушай букву,", "введи клавишу");
       }
       else if (row == KEY_GAME2_ROW && col == KEY_GAME2_COL) {
         selectedGame = 2;
-        myDFPlayer.playMp3Folder(TRACK_GAME2_SELECT);
+        myDFPlayer.play(TRACK_GAME2_SELECT);
         drawScreen("ИГРА 2", "Выбрана игра 2", "ENTER для старта");
       }
       else if (row == KEY_GAME3_ROW && col == KEY_GAME3_COL) {
         selectedGame = 3;
-        myDFPlayer.playMp3Folder(TRACK_GAME3_SELECT);
+        myDFPlayer.play(TRACK_GAME3_SELECT);
         drawScreen("ИГРА 3", "Выбрана игра 3", "ENTER для старта");
       }
       else if (row == KEY_ENTER_ROW && col == KEY_ENTER_COL) {
         if (selectedGame > 0) {
-          myDFPlayer.playMp3Folder(TRACK_CONFIRM);
+          myDFPlayer.play(TRACK_CONFIRM);
           startGame();
         } else {
           drawScreen("МЕНЮ", "Сначала выбери", "игру: 1, 2, 3");
@@ -353,7 +353,7 @@ void handleKeyPress(int row, int col, char keyChar) {
       if (row == KEY_VOLDOWN_ROW && col == KEY_VOLDOWN_COL) {
         currentVolume = max(0, currentVolume - 4);
         myDFPlayer.volume(currentVolume);
-        myDFPlayer.playMp3Folder(TRACK_VOL_DOWN);
+        myDFPlayer.play(TRACK_VOL_DOWN);
         Serial.print(F("[VOL] Down -> "));
         Serial.println(currentVolume);
         return;
@@ -361,7 +361,7 @@ void handleKeyPress(int row, int col, char keyChar) {
       if (row == KEY_START_ROW && col == KEY_START_COL) {
         currentVolume = min(30, currentVolume + 4);
         myDFPlayer.volume(currentVolume);
-        myDFPlayer.playMp3Folder(TRACK_VOL_UP);
+        myDFPlayer.play(TRACK_VOL_UP);
         Serial.print(F("[VOL] Up -> "));
         Serial.println(currentVolume);
         return;
@@ -391,7 +391,7 @@ void startGame() {
   Serial.print(F("[GAME] Starting game "));
   Serial.println(selectedGame);
 
-  myDFPlayer.playMp3Folder(TRACK_START);
+  myDFPlayer.play(TRACK_START);
   drawScreen("ПОЕХАЛИ!", "Слушай букву...", "");
   scheduleDelay(1500, DA_NEXT_LETTER);
 }
@@ -416,7 +416,7 @@ void nextLetter() {
 
   if (unpassedCount == 0) {
     Serial.println(F("[GAME] All letters passed -> VICTORY"));
-    myDFPlayer.playMp3Folder(TRACK_VICTORY);
+    myDFPlayer.play(TRACK_VICTORY);
     drawScreen("ПОБЕДА!", "Молодец!", "ESC=в меню");
     scheduleDelay(4000, DA_RESET);
     return;
@@ -437,7 +437,7 @@ void nextLetter() {
   char buf[20];
   snprintf(buf, sizeof(buf), "Буква: %s", alphabet[currentLetterId].symbol);
   drawScreen("СЛУШАЙ", buf, "Введи и жми ENT");
-  myDFPlayer.playMp3Folder(alphabet[currentLetterId].id);
+  myDFPlayer.play(alphabet[currentLetterId].id);
 }
 
 // ============================================================
@@ -459,7 +459,7 @@ void checkAnswer() {
 
   if (lastTypedChar == alphabet[currentLetterId].expectedKey) {
     Serial.println(F("[CHECK] -> CORRECT"));
-    myDFPlayer.playMp3Folder(TRACK_CORRECT);
+    myDFPlayer.play(TRACK_CORRECT);
     alphabet[currentLetterId].passed = true;
     lastTypedChar = '\0';
     drawScreen("ВЕРНО!", alphabet[currentLetterId].symbol, "Отлично!");
@@ -475,13 +475,13 @@ void checkAnswer() {
     if (alphabet[currentLetterId].mistakes >= 3) {
       Serial.println(F("[CHECK] -> SKIP (3 mistakes)"));
       alphabet[currentLetterId].passed = true;
-      myDFPlayer.playMp3Folder(TRACK_SKIP);
+      myDFPlayer.play(TRACK_SKIP);
       char buf[20];
       snprintf(buf, sizeof(buf), "Буква: %s", alphabet[currentLetterId].symbol);
       drawScreen("ПРОПУСК", buf, "Запомни её!");
       scheduleDelay(2500, DA_NEXT_LETTER);
     } else {
-      myDFPlayer.playMp3Folder(TRACK_WRONG);
+      myDFPlayer.play(TRACK_WRONG);
       char errBuf[16];
       snprintf(errBuf, sizeof(errBuf), "Ошибок: %d/3", alphabet[currentLetterId].mistakes);
       drawScreen("ОШИБКА!", errBuf, "Попробуй снова");

@@ -4,12 +4,14 @@
 int myFunction(int, int);
 
 void setup() {
+  Serial.println("Hello, world!");
   // put your setup code here, to run once:
   int result = myFunction(2, 3);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  Serial.println("Hello, world!");
+  delay(1000);
 }
 
 // put function definitions here:
